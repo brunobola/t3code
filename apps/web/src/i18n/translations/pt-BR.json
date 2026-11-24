@@ -12870,5 +12870,9 @@
   "f6a91589456cca50": "Aprovado",
   "c92657bb7f2293ff": "Precisa de aprovação",
   "f1e5c1be1ac92361": "Aprovar",
-  "fcb5f3c4d4753326": "Esta conexão não pode aprovar comandos. Use um cliente que possa usar o terminal."
+  "fcb5f3c4d4753326": "Esta conexão não pode aprovar comandos. Use um cliente que possa usar o terminal.",
+  "116b1c9bab0c8dce": "Desenha os menus do clique direito dentro do app, para que os temas possam estilizá-los. Desativado usa os menus do sistema.",
+  "13ec4afa80f3ce95": "Redefinir os menus com tema para o padrão",
+  "d02756ef6d2a0561": "Menus com tema",
+  "a1facca986a54537": "clique direito menu de contexto nativo sistema ícones tema estilo right click context menu"
 }

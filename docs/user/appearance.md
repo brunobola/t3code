@@ -60,6 +60,10 @@ For a change that colors cannot make, open **Custom CSS** in the theme editor. T
 the theme, applies after T3 Code's own styles on web and desktop, and is included in exports. Use
 `.dark` or `:root:not(.dark)` to target one appearance.
 
+On desktop, right-click menus are your system's menus, which CSS cannot reach. Turn on
+**Settings → Appearance → Themed menus** to draw them inside the app, where `[data-context-menu]`
+rules apply as they do on web.
+
 Custom CSS cannot load files. `@import`, `image-set()`, and `url()` are ignored, except `url()`
 with a `data:` address or an `#id`. This keeps an imported theme from sending what is on your screen
 to another site. For a full-size image, use a [background image](#background-image).

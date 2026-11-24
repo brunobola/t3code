@@ -13,6 +13,11 @@ import { readBrowserClientSettings, writeBrowserClientSettings } from "./clientP
 import { m } from "./i18n/messages";
 
 let cachedApi: LocalApi | undefined;
+let themedContextMenus = false;
+
+export function setThemedContextMenus(enabled: boolean): void {
+  themedContextMenus = enabled;
+}
 
 export function createLocalApi(): LocalApi {
   return {
@@ -54,16 +59,14 @@ export function createLocalApi(): LocalApi {
         position?: { x: number; y: number },
         source?: ContextMenuSource,
       ): Promise<T | null> => {
-        if (window.desktopBridge) {
+        if (window.desktopBridge && !themedContextMenus) {
           return window.desktopBridge.showContextMenu(items, position, source) as Promise<T | null>;
         }
         return showContextMenuFallback(items, position, source);
       },
       // Unlike native menus, the DOM fallback needs dismissal when underlying state disappears.
       close: async () => {
-        if (!window.desktopBridge) {
-          dismissContextMenu();
-        }
+        dismissContextMenu();
       },
     },
     persistence: {

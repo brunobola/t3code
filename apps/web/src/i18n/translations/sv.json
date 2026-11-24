@@ -12877,5 +12877,9 @@
   "f6a91589456cca50": "Godkänt",
   "c92657bb7f2293ff": "Behöver godkännande",
   "f1e5c1be1ac92361": "Godkänn",
-  "fcb5f3c4d4753326": "Den här anslutningen kan inte godkänna kommandon. Använd en klient som får använda terminalen."
+  "fcb5f3c4d4753326": "Den här anslutningen kan inte godkänna kommandon. Använd en klient som får använda terminalen.",
+  "116b1c9bab0c8dce": "Rita högerklicksmenyer i appen så att teman kan formge dem. Av använder systemets menyer.",
+  "13ec4afa80f3ce95": "Återställ temamenyer till standard",
+  "d02756ef6d2a0561": "Temamenyer",
+  "a1facca986a54537": "högerklick snabbmeny inbyggd system ikoner tema stil right click context menu"
 }

@@ -71,4 +71,27 @@ describe("LocalApi", () => {
 
     await expect(createLocalApi().dialogs.confirm("Delete this thread?")).resolves.toBe(false);
   });
+
+  it("shows themed context menus in the DOM on desktop only when enabled", async () => {
+    const items: ContextMenuItem<"rename">[] = [{ id: "rename", label: "Rename" }];
+    const nativeShow = vi.fn(async () => "rename" as const);
+    Object.defineProperty(testWindow(), "desktopBridge", {
+      configurable: true,
+      value: { showContextMenu: nativeShow },
+    });
+    showContextMenuFallbackMock.mockResolvedValue(null);
+    const { createLocalApi, setThemedContextMenus } = await import("./localApi");
+    const api = createLocalApi();
+
+    await expect(api.contextMenu.show(items)).resolves.toBe("rename");
+    expect(showContextMenuFallbackMock).not.toHaveBeenCalled();
+
+    setThemedContextMenus(true);
+    await expect(api.contextMenu.show(items)).resolves.toBeNull();
+    expect(nativeShow).toHaveBeenCalledTimes(1);
+    expect(showContextMenuFallbackMock).toHaveBeenCalledTimes(1);
+
+    await api.contextMenu.close();
+    expect(dismissContextMenuMock).toHaveBeenCalledTimes(1);
+  });
 });

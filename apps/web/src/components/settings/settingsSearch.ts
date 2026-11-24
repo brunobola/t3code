@@ -409,6 +409,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: [msg("latex tex katex equations formulas markdown")],
   },
   {
+    id: "themed-context-menus",
+    title: msg("Themed menus"),
+    to: "/settings/appearance",
+    searchTerms: [msg("right click context menu native system icons theme style")],
+    desktopOnly: true,
+  },
+  {
     id: "panel-animations",
     title: msg("Panel animations"),
     to: "/settings/appearance",

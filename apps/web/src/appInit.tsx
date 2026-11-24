@@ -47,6 +47,7 @@ import {
   subscribeClientSettings,
 } from "./hooks/useSettings";
 import { syncBrowserChromeTheme } from "./hooks/useTheme";
+import { setThemedContextMenus } from "./localApi";
 import { startThreadVisitedMigration } from "./hooks/useThreadVisitedMigration";
 import { installDesktopPasteAsText } from "./lib/desktopPasteAsText";
 import {
@@ -90,6 +91,9 @@ function startClientAppearance(): void {
     }
     if (previous?.chatWidth !== settings.chatWidth) {
       root.dataset.chatWidth = settings.chatWidth;
+    }
+    if (previous?.themedContextMenus !== settings.themedContextMenus) {
+      setThemedContextMenus(settings.themedContextMenus);
     }
     if (previous?.htmlPreviewWidth !== settings.htmlPreviewWidth) {
       root.dataset.htmlPreviewWidth = settings.htmlPreviewWidth;
