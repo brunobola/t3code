@@ -199,6 +199,56 @@ function createIconElement(name: string, tone: "neutral" | "destructive"): SVGSV
   return svg;
 }
 
+const NATIVE_ICON_PIXELS = 32;
+const nativeIconCache = new Map<string, string | null>();
+
+function traceIconNode(context: CanvasRenderingContext2D, tag: string, a: Record<string, string>) {
+  const n = (key: string) => Number(a[key] ?? 0);
+  if (tag === "path") return context.stroke(new Path2D(a.d));
+  context.beginPath();
+  if (tag === "line") {
+    context.moveTo(n("x1"), n("y1"));
+    context.lineTo(n("x2"), n("y2"));
+  } else if (tag === "circle") {
+    context.arc(n("cx"), n("cy"), n("r"), 0, Math.PI * 2);
+  } else if (tag === "rect") {
+    context.roundRect(n("x"), n("y"), n("width"), n("height"), n("rx"));
+  }
+  context.stroke();
+}
+
+let nativeIconContext: CanvasRenderingContext2D | null | undefined;
+
+// Native menus only take bitmaps. One CPU-backed canvas draws the icon paths synchronously;
+// a fresh GPU canvas per icon made the first menu wait about 30 ms on readback.
+export function rasterizeMenuIcon(name: string, color: string): string | null {
+  const key = `${name}|${color}`;
+  const cached = nativeIconCache.get(key);
+  if (cached !== undefined) return cached;
+  const paths = ICON_PATHS[name];
+  if (nativeIconContext === undefined) {
+    const canvas = document.createElement("canvas");
+    canvas.width = NATIVE_ICON_PIXELS;
+    canvas.height = NATIVE_ICON_PIXELS;
+    nativeIconContext = canvas.getContext("2d", { willReadFrequently: true });
+  }
+  const context = nativeIconContext;
+  let result: string | null = null;
+  if (context && paths) {
+    const scale = NATIVE_ICON_PIXELS / 24;
+    context.setTransform(scale, 0, 0, scale, 0, 0);
+    context.clearRect(0, 0, 24, 24);
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    for (const node of paths) traceIconNode(context, node.tag, node.attrs);
+    result = context.canvas.toDataURL("image/png");
+  }
+  nativeIconCache.set(key, result);
+  return result;
+}
+
 function clampMenuPosition(menu: HTMLDivElement, preferredLeft: number, preferredTop: number) {
   const rect = menu.getBoundingClientRect();
   const left = Math.min(

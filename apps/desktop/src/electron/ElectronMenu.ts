@@ -115,15 +115,25 @@ const normalizePosition = (
     Option.map(({ x, y }) => ({ x: Math.floor(x * zoomFactor), y: Math.floor(y * zoomFactor) })),
   );
 
+const menuIconImages = new Map<string, Option.Option<Electron.NativeImage>>();
+const MAX_MENU_ICON_IMAGES = 256;
+
 // Renderer icons are 32px PNGs; a 2x representation keeps them 16pt and sharp on Retina.
+// Menus reopen with the same icons, so each data URL is decoded once.
 function menuIconImage(dataUrl: string): Option.Option<Electron.NativeImage> {
+  const cached = menuIconImages.get(dataUrl);
+  if (cached !== undefined) return cached;
+  let result: Option.Option<Electron.NativeImage>;
   try {
     const image = Electron.nativeImage.createEmpty();
     image.addRepresentation({ scaleFactor: 2, dataURL: dataUrl });
-    return image.isEmpty() ? Option.none() : Option.some(image);
+    result = image.isEmpty() ? Option.none() : Option.some(image);
   } catch {
-    return Option.none();
+    result = Option.none();
   }
+  if (menuIconImages.size >= MAX_MENU_ICON_IMAGES) menuIconImages.clear();
+  menuIconImages.set(dataUrl, result);
+  return result;
 }
 
 /** @public */

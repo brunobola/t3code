@@ -8,11 +8,40 @@ import { msg } from "gt-react";
 
 import { isWebUrl } from "./browser/webUrl";
 import { requestConfirmDialog } from "./confirmDialog";
-import { dismissContextMenu, showContextMenuFallback } from "./contextMenuFallback";
+import {
+  dismissContextMenu,
+  rasterizeMenuIcon,
+  showContextMenuFallback,
+} from "./contextMenuFallback";
 import { readBrowserClientSettings, writeBrowserClientSettings } from "./clientPersistenceStorage";
 import { m } from "./i18n/messages";
 
 let cachedApi: LocalApi | undefined;
+
+// Native menus follow the app's light or dark mode, so the icon color follows it too.
+// macOS menus need template images to recolor on highlight, so they keep their own icons.
+const drawsNativeMenuIcons = () => !/^Mac/.test(navigator.platform);
+const nativeMenuIconColor = () =>
+  document.documentElement.classList.contains("dark") ? "#c8c8c8" : "#555555";
+
+function withNativeMenuIcons<T extends string>(
+  items: readonly ContextMenuItem<T>[],
+): ContextMenuItem<T>[] {
+  return items.map((item) => {
+    const children = item.children ? withNativeMenuIcons(item.children) : undefined;
+    // Windows draws an item's icon in the check column, so checkable items keep only the check.
+    const iconImage =
+      item.iconImage ??
+      (item.icon && typeof item.checked !== "boolean"
+        ? rasterizeMenuIcon(item.icon, nativeMenuIconColor())
+        : null);
+    return {
+      ...item,
+      ...(children ? { children } : {}),
+      ...(iconImage ? { iconImage } : {}),
+    };
+  });
+}
 
 export function createLocalApi(): LocalApi {
   return {
@@ -55,7 +84,12 @@ export function createLocalApi(): LocalApi {
         source?: ContextMenuSource,
       ): Promise<T | null> => {
         if (window.desktopBridge) {
-          return window.desktopBridge.showContextMenu(items, position, source) as Promise<T | null>;
+          const withIcons = drawsNativeMenuIcons() ? withNativeMenuIcons(items) : items;
+          return window.desktopBridge.showContextMenu(
+            withIcons,
+            position,
+            source,
+          ) as Promise<T | null>;
         }
         return showContextMenuFallback(items, position, source);
       },
