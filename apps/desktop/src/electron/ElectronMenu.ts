@@ -127,6 +127,14 @@ function menuIconImage(dataUrl: string): Option.Option<Electron.NativeImage> {
   try {
     const image = Electron.nativeImage.createEmpty();
     image.addRepresentation({ scaleFactor: 2, dataURL: dataUrl });
+    // A ready 1x copy keeps the menu from scaling every icon down each time it opens (~6 ms).
+    if (!image.isEmpty()) {
+      const { width, height } = image.getSize(2);
+      image.addRepresentation({
+        scaleFactor: 1,
+        buffer: image.resize({ width: width / 2, height: height / 2, quality: "best" }).toPNG(),
+      });
+    }
     result = image.isEmpty() ? Option.none() : Option.some(image);
   } catch {
     result = Option.none();
