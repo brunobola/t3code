@@ -9,6 +9,7 @@ const showContextMenuFallbackMock =
     ) => Promise<T | null>
   >();
 const dismissContextMenuMock = vi.fn<() => void>();
+const rasterizeMenuIconMock = vi.fn((name: string, color: string) => `png:${name}:${color}`);
 
 const requestConfirmDialogMock =
   vi.fn<(message: string, options?: ConfirmDialogOptions) => Promise<boolean> | undefined>();
@@ -16,6 +17,7 @@ const requestConfirmDialogMock =
 vi.mock("./contextMenuFallback", () => ({
   showContextMenuFallback: showContextMenuFallbackMock,
   dismissContextMenu: dismissContextMenuMock,
+  rasterizeMenuIcon: rasterizeMenuIconMock,
 }));
 
 vi.mock("./confirmDialog", () => ({
@@ -62,6 +64,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("LocalApi", () => {
@@ -70,5 +73,42 @@ describe("LocalApi", () => {
     const { createLocalApi } = await import("./localApi");
 
     await expect(createLocalApi().dialogs.confirm("Delete this thread?")).resolves.toBe(false);
+  });
+
+  it("draws named icons into native desktop menus, except checkable items and macOS", async () => {
+    const nativeShow = vi.fn(async (_items: readonly ContextMenuItem[]) => null);
+    Object.defineProperty(testWindow(), "desktopBridge", {
+      configurable: true,
+      value: { showContextMenu: nativeShow },
+    });
+    vi.stubGlobal("document", {
+      documentElement: { classList: { contains: (name: string) => name === "dark" } },
+    });
+    const items: ContextMenuItem[] = [
+      { id: "pin", label: "Pin", icon: "pin" },
+      { id: "editor", label: "Open in editor", icon: "folder", iconImage: "png:editor" },
+      {
+        id: "auto",
+        label: "Auto-settle",
+        icon: "timer",
+        children: [{ id: "never", label: "Never", icon: "check", checked: true }],
+      },
+    ];
+    const { createLocalApi } = await import("./localApi");
+    const api = createLocalApi();
+
+    vi.stubGlobal("navigator", { platform: "Win32" });
+    await api.contextMenu.show(items);
+    const [shown] = nativeShow.mock.calls[0]!;
+    expect(shown.map((item) => item.iconImage)).toEqual([
+      "png:pin:#c8c8c8",
+      "png:editor",
+      "png:timer:#c8c8c8",
+    ]);
+    expect(shown[2]!.children![0]!.iconImage).toBeUndefined();
+
+    vi.stubGlobal("navigator", { platform: "MacIntel" });
+    await api.contextMenu.show(items);
+    expect(nativeShow.mock.calls[1]![0]).toBe(items);
   });
 });
