@@ -10,6 +10,7 @@ import {
 import { T, useGT, useMessages } from "gt-react";
 
 import { hasCloudPublicConfig } from "~/cloud/publicConfig";
+import { isElectron } from "~/env";
 import { useT3ConnectAuthPrompt } from "../clerk/useT3ConnectAuthPrompt";
 import { Button } from "../ui/button";
 import { NumberField, NumberFieldGroup, NumberFieldInput } from "../ui/number-field";
@@ -38,6 +39,7 @@ export function LabsSettingsPanel() {
     <SettingsPageContainer>
       <SettingsSection id="beta" title={gt("Beta")}>
         <BoringSidebarRow />
+        {isElectron ? <ThemedContextMenusRow /> : null}
         {/* Clerk is only mounted when this build has T3 Connect. */}
         {hasCloudPublicConfig() ? <GuestLinksRowWithSignIn /> : <GuestLinksRow />}
         <LinkedEnvironmentsRow />
@@ -99,6 +101,28 @@ function BoringSidebarMultilineRow() {
             updateSettings({ boringSidebarMultilineRows: Boolean(checked) })
           }
           aria-label={gt("Two-line folder rows")}
+        />
+      }
+    />
+  );
+}
+
+function ThemedContextMenusRow() {
+  const searchableSetting = useSearchableSetting();
+  const settings = useScopedSettings();
+  const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
+  return (
+    <SettingsRow
+      {...searchableSetting("themed-context-menus")}
+      description={gt(
+        "Draw right-click menus inside the app, so themes can style them. Off uses your system's menus.",
+      )}
+      control={
+        <Switch
+          checked={settings.themedContextMenus}
+          onCheckedChange={(checked) => updateSettings({ themedContextMenus: Boolean(checked) })}
+          aria-label={gt("Themed menus")}
         />
       }
     />

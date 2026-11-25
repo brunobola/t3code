@@ -409,13 +409,6 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: [msg("latex tex katex equations formulas markdown")],
   },
   {
-    id: "themed-context-menus",
-    title: msg("Themed menus"),
-    to: "/settings/appearance",
-    searchTerms: [msg("right click context menu native system icons theme style")],
-    desktopOnly: true,
-  },
-  {
     id: "panel-animations",
     title: msg("Panel animations"),
     to: "/settings/appearance",
@@ -518,6 +511,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     title: msg("Boring sidebar (group by project)"),
     to: "/settings/labs",
     searchTerms: [msg("beta folders project tree classic sidebar")],
+  },
+  {
+    id: "themed-context-menus",
+    title: msg("Themed menus"),
+    to: "/settings/labs",
+    searchTerms: [msg("right click context menu native system icons theme style")],
+    desktopOnly: true,
   },
   {
     id: "boring-sidebar-multiline",

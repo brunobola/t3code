@@ -61,7 +61,7 @@ the theme, applies after T3 Code's own styles on web and desktop, and is include
 `.dark` or `:root:not(.dark)` to target one appearance.
 
 On desktop, right-click menus are your system's menus, which CSS cannot reach. Turn on
-**Settings → Appearance → Themed menus** to draw them inside the app, where `[data-context-menu]`
+**Settings → Labs → Themed menus** to draw them inside the app, where `[data-context-menu]`
 rules apply as they do on web.
 
 Custom CSS cannot load files. `@import`, `image-set()`, and `url()` are ignored, except `url()`

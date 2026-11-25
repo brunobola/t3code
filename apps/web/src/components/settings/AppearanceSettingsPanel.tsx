@@ -23,7 +23,6 @@ import {
 import { useCustomThemes } from "../../hooks/useCustomThemes";
 import { useEnvironmentIdentificationMode } from "../../hooks/useSettings";
 import { useTheme } from "../../hooks/useTheme";
-import { isElectron } from "../../env";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
@@ -411,35 +410,6 @@ export function AppearanceSettingsPanel() {
             />
           }
         />
-        {isElectron ? (
-          <SettingsRow
-            {...searchableSetting("themed-context-menus")}
-            description={gt(
-              "Draw right-click menus inside the app, so themes can style them. Off uses your system's menus.",
-            )}
-            resetAction={
-              settings.themedContextMenus !== DEFAULT_UNIFIED_SETTINGS.themedContextMenus ? (
-                <SettingResetButton
-                  ariaLabel={gt("Reset themed menus to default")}
-                  onClick={() =>
-                    updateSettings({
-                      themedContextMenus: DEFAULT_UNIFIED_SETTINGS.themedContextMenus,
-                    })
-                  }
-                />
-              ) : null
-            }
-            control={
-              <Switch
-                checked={settings.themedContextMenus}
-                onCheckedChange={(checked) =>
-                  updateSettings({ themedContextMenus: Boolean(checked) })
-                }
-                aria-label={gt("Themed menus")}
-              />
-            }
-          />
-        ) : null}
         <AdvancedSettings
           targetIds={[
             searchableSetting("panel-animations").id,
